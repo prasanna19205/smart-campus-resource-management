@@ -46,7 +46,7 @@ Neo4j represents campus entities as nodes and their connections as relationships
    - `00_create_data.cypher`
    - `02_relationships.cypher`
    - `03_business_rules.cypher`
-
+   - `04_demo_queries.cypher`
 The business rules file creates a sample resource allocation and contains validation queries.
 
 ## 6. Demonstration Dataset
