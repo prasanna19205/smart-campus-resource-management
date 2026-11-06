@@ -1,4 +1,4 @@
-@'
+
 // SMART CAMPUS RESOURCE MANAGEMENT
 // NEO4J CRUD AND GRAPH QUERY DEMONSTRATIONS
 // Database: smart.campus.graph
@@ -127,4 +127,3 @@ ORDER BY r.resource_id;
 MATCH (n)
 OPTIONAL MATCH (n)-[rel]->(m)
 RETURN n, rel, m;
-'@ | Set-Content -Encoding UTF8 .\neo4j\04_demo_queries.cypher
