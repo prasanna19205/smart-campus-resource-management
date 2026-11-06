@@ -1,116 +1,153 @@
-\# Neo4j Test Results
+# Neo4j Test Results
 
+## 1. Testing Overview
 
+The Neo4j graph database component of the Smart Campus Resource & Event Management System was tested using Cypher queries.
 
-\## 1. Testing Overview
+**Database:** `smart.campus.graph`
 
+**Testing Environment:** Neo4j Desktop 2.3.1, Neo4j 2026.10.1
 
+## 2. Node and Relationship Verification
 
-The Neo4j graph database component of the Smart Campus Resource \& Event Management System was tested using Cypher queries.
+The initial demonstration graph was verified before adding the resource allocation relationship.
 
+- Expected nodes: 19
+- Actual nodes: 19
+- Status: PASS
+- Expected relationships: 15
+- Actual relationships: 15
+- Status: PASS
 
+After implementing resource allocation:
 
-\*\*Database:\*\* `smart.campus.graph`
+- Total nodes: 19
+- Total relationships: 16
+- Status: PASS
 
+## 3. Functional Test Cases
 
+The following functional queries were executed successfully:
 
-\## 2. Node and Relationship Verification
+- **Event organizer query:** Returned 2 records. Status: PASS.
+- **Booking and venue query:** Returned 2 records. Status: PASS.
+- **Student registration query:** Returned 3 records. Status: PASS.
+- **Resource maintenance query:** Returned 1 record. Status: PASS.
+- **Event feedback query:** Returned 1 record. Status: PASS.
 
+## 4. Verified Query Results
 
+### Event Organizers
 
-| Metric | Expected | Actual | Status |
+- Aarav Sharma — AI Workshop
+- Aarav Sharma — Coding Contest
 
-|---|---:|---:|---|
+### Bookings and Venues
 
-| Total nodes | 19 | 19 | PASS |
+- AI Workshop — confirmed — Seminar Hall A
+- Coding Contest — confirmed — Computer Lab 1
 
-| Total relationships | 15 | 15 | PASS |
+### Student Registrations
 
+- Priya Reddy — AI Workshop
+- Rahul Kumar — AI Workshop
+- Priya Reddy — Coding Contest
 
+### Resource Maintenance
 
-\## 3. Functional Test Cases
+- Laptop — Scheduled laptop maintenance
 
+### Event Feedback
 
+- Submitted by: Priya Reddy
+- Event: AI Workshop
+- Rating: 5
+- Comment: Very informative workshop
 
-| Test Case | Expected Result | Actual Result | Status |
+## 5. Business Rule Validation Tests
 
-|---|---|---|---|
+### Test 1: Resource Allocation
 
-| Event organizer query | 2 records | 2 records | PASS |
+A resource allocation relationship was created between Booking 1 and Projector 1.
 
-| Booking and venue query | 2 records | 2 records | PASS |
+- Allocated quantity: 2
+- Projector stock: 3
+- Remaining stock: 1
+- Expected result: Allocation successfully created.
+- Actual result: Allocation successfully created.
+- Status: PASS.
 
-| Student registration query | 3 records | 3 records | PASS |
+### Test 2: Resource Stock Validation
 
-| Resource maintenance query | 1 record | 1 record | PASS |
+The allocated quantity was compared against the available stock of all resources.
 
-| Event feedback query | 1 record | 1 record | PASS |
+- Projector: 3 available, 2 allocated, 1 remaining.
+- Microphone: 5 available, 0 allocated, 5 remaining.
+- Laptop: 10 available, 0 allocated, 10 remaining.
+- Expected result: All resources should have valid stock.
+- Actual result: All resources returned VALID.
+- Status: PASS.
 
+### Test 3: Excessive Resource Allocation
 
+A simulated request for 2 additional projectors was tested.
 
-\## 4. Verified Query Results
+- Total projector stock: 3
+- Already allocated: 2
+- New request: 2
+- Total required: 4
+- Expected result: Reject the request because stock is insufficient.
+- Actual result: REJECTED: Insufficient stock.
+- Status: PASS.
 
+### Test 4: Event Registration Capacity Validation
 
+A simulated request for 79 additional registrations was tested for the AI Workshop.
 
-\### Event Organizers
+- Event capacity: 80
+- Existing registrations: 2
+- New registration request: 79
+- Total required: 81
+- Expected result: Reject the request because event capacity is exceeded.
+- Actual result: REJECTED: Event capacity exceeded.
+- Status: PASS.
 
-\- Aarav Sharma — AI Workshop
+### Test 5: Venue Booking Conflict Validation
 
-\- Aarav Sharma — Coding Contest
+A simulated booking was tested for Seminar Hall A on November 10, 2026, from 11:00 to 13:00.
 
+An existing confirmed booking already occupies the venue from 10:00 to 12:00.
 
+- Existing conflicting bookings: 1
+- Expected result: Reject the overlapping booking.
+- Actual result: REJECTED: Venue already booked.
+- Status: PASS.
 
-\### Bookings and Venues
+All business-rule validation scenarios produced their expected results. These negative tests were read-only simulations and did not modify the existing demonstration records.
 
-\- AI Workshop — confirmed — Seminar Hall A
+## 6. Conclusion
 
-\- Coding Contest — confirmed — Computer Lab 1
+The Neo4j graph database component has been implemented and tested successfully.
 
+The implementation includes:
 
+- Eight node types.
+- Eight uniqueness constraints.
+- Demonstration nodes and relationships.
+- Resource allocation relationships.
+- Resource stock validation.
+- Event registration capacity validation.
+- Venue booking conflict validation.
+- Graph verification and functional queries.
 
-\### Student Registrations
+The initial graph contains 19 nodes and 15 relationships. After adding resource allocation, it contains 19 nodes and 16 relationships.
 
-\- Priya Reddy — AI Workshop
+All executed functional and business-rule validation tests passed.
 
-\- Rahul Kumar — AI Workshop
+**Limitations:**
 
-\- Priya Reddy — Coding Contest
-
-
-
-\### Resource Maintenance
-
-\- Laptop — Scheduled laptop maintenance
-
-
-
-\### Event Feedback
-
-\- Submitted by: Priya Reddy
-
-\- Event: AI Workshop
-
-\- Rating: 5
-
-\- Comment: Very informative workshop
-
-
-
-\## 5. Conclusion
-
-
-
-All the listed Neo4j functional verification tests passed.
-
-
-
-The demonstration graph contains 19 nodes and 15 relationships across eight node types.
-
-
-
-The graph setup, uniqueness constraints, sample data and relationships have been implemented and verified.
-
-
-
-\*\*Limitation:\*\* The current graph uses demonstration seed data. Automatic synchronization with PostgreSQL and end-to-end application integration have not yet been implemented or tested.
+- The graph currently uses demonstration seed data.
+- Automatic synchronization with PostgreSQL has not been implemented.
+- Web application integration and end-to-end testing remain pending.
+- The validation queries demonstrate business-rule checks but do not independently guarantee atomic enforcement during concurrent writes. Application-level transaction handling is required for that.
 
