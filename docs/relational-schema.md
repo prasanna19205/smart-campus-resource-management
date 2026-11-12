@@ -1,54 +1,91 @@
-# Smart Campus Resource & Event Management System
-## Relational Schema
 
-The system uses PostgreSQL to store structured information about campus users, events, venues, equipment, bookings, registrations, maintenance, feedback, and equipment allocations.
+# Relational Schema – Smart Campus Resource & Event Management System
 
-### 1. Relations
+```mermaid
+erDiagram
 
-**APP_USER**(`user_id` PK, full_name, email UNIQUE, role)
+    APP_USER {
+        INTEGER user_id PK
+        VARCHAR full_name
+        VARCHAR email UK
+        VARCHAR role
+    }
 
-**CAMPUS_EVENT**(`event_id` PK, event_name, description, `organizer_id` FK → APP_USER.user_id, start_time, end_time, capacity)
+    CAMPUS_EVENT {
+        INTEGER event_id PK
+        VARCHAR event_name
+        TEXT description
+        INTEGER organizer_id FK
+        TIMESTAMP start_time
+        TIMESTAMP end_time
+        INTEGER capacity
+    }
 
-**VENUE**(`venue_id` PK, venue_name UNIQUE, location, capacity)
+    VENUE {
+        INTEGER venue_id PK
+        VARCHAR venue_name UK
+        VARCHAR location
+        INTEGER capacity
+    }
 
-**RESOURCE**(`resource_id` PK, resource_name, quantity, status)
+    RESOURCE {
+        INTEGER resource_id PK
+        VARCHAR resource_name
+        INTEGER quantity
+        VARCHAR status
+    }
 
-**BOOKING**(`booking_id` PK, `event_id` FK → CAMPUS_EVENT.event_id, `venue_id` FK → VENUE.venue_id, start_time, end_time, status)
+    BOOKING {
+        INTEGER booking_id PK
+        INTEGER event_id FK
+        INTEGER venue_id FK
+        TIMESTAMP start_time
+        TIMESTAMP end_time
+        VARCHAR status
+    }
 
-**REGISTRATION**(`registration_id` PK, `event_id` FK → CAMPUS_EVENT.event_id, `user_id` FK → APP_USER.user_id, registered_at, UNIQUE(event_id, user_id))
+    REGISTRATION {
+        INTEGER registration_id PK
+        INTEGER event_id FK
+        INTEGER user_id FK
+        TIMESTAMP registered_at
+    }
 
-**MAINTENANCE**(`maintenance_id` PK, `resource_id` FK → RESOURCE.resource_id, start_time, end_time, description)
+    MAINTENANCE {
+        INTEGER maintenance_id PK
+        INTEGER resource_id FK
+        TIMESTAMP start_time
+        TIMESTAMP end_time
+        TEXT description
+    }
 
-**FEEDBACK**(`feedback_id` PK, `event_id` FK → CAMPUS_EVENT.event_id, `user_id` FK → APP_USER.user_id, rating, comments, submitted_at, UNIQUE(event_id, user_id))
+    FEEDBACK {
+        INTEGER feedback_id PK
+        INTEGER event_id FK
+        INTEGER user_id FK
+        INTEGER rating
+        TEXT comments
+        TIMESTAMP submitted_at
+    }
 
-**BOOKING_RESOURCE**(`booking_id` PK/FK → BOOKING.booking_id, `resource_id` PK/FK → RESOURCE.resource_id, quantity)
+    BOOKING_RESOURCE {
+        INTEGER booking_id PK, FK
+        INTEGER resource_id PK, FK
+        INTEGER quantity
+    }
 
-### 2. Relationships and cardinalities
+    APP_USER ||--o{ CAMPUS_EVENT : organizes
+    APP_USER ||--o{ REGISTRATION : makes
+    APP_USER ||--o{ FEEDBACK : submits
 
-- One user can organize multiple events.
-- One user can register for multiple events.
-- One event can receive multiple registrations.
-- One event can have multiple booking records.
-- One venue can have multiple bookings at different times.
-- One booking can require multiple resource types through BOOKING_RESOURCE.
-- One resource type can be allocated to multiple bookings.
-- One resource can have multiple maintenance records.
-- One user can submit feedback for multiple events, with at most one feedback record per event.
+    CAMPUS_EVENT ||--o{ REGISTRATION : has
+    CAMPUS_EVENT ||--o{ FEEDBACK : receives
+    CAMPUS_EVENT ||--o{ BOOKING : has
 
-### 3. Integrity rules
+    VENUE ||--o{ BOOKING : assigned_to
 
-- Primary keys uniquely identify records.
-- Foreign keys maintain relationships between tables.
-- Email addresses must be unique.
-- Event and venue capacities must be positive.
-- Event, booking, and maintenance end times must follow their start times.
-- Registration records must be unique for each event-user pair.
-- Feedback ratings must be between 1 and 5.
-- Confirmed bookings for the same venue cannot overlap.
-- Registration capacity is enforced by a database trigger.
+    RESOURCE ||--o{ MAINTENANCE : undergoes
 
-### 4. Equipment allocation
-
-BOOKING_RESOURCE is a junction relation between BOOKING and RESOURCE. Its composite primary key prevents duplicate allocation rows for the same booking-resource pair. The quantity column records how many units of a resource are requested.
-
-Resource inventory availability and prevention of equipment over-allocation require additional validation beyond this relationship table.
+    BOOKING ||--o{ BOOKING_RESOURCE : contains
+    RESOURCE ||--o{ BOOKING_RESOURCE : allocated_in
+```
